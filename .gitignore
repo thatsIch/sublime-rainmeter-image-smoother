@@ -1,0 +1,17 @@
+# exclude all
+/*
+
+# include important folders
+# include maven
+!pom.xml
+
+# include markdowns
+!README.md
+!LICENSE
+
+# include sourcecode
+!src/
+
+# include git important files
+!.gitmodules
+!.gitignore
