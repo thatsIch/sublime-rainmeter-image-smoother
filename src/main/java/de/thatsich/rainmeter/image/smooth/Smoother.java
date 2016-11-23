@@ -6,7 +6,9 @@ import java.io.File;
 
 import static org.bytedeco.javacpp.opencv_core.Mat;
 import static org.bytedeco.javacpp.opencv_imgcodecs.IMREAD_UNCHANGED;
+import static org.bytedeco.javacpp.opencv_imgproc.CV_RGB2RGBA;
 import static org.bytedeco.javacpp.opencv_imgproc.blur;
+import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 
 /**
  * @author thatsIch (thatsich@mail.de)
@@ -23,15 +25,17 @@ public class Smoother {
 		final String filename = args[0];
 		final File inputFile = new File(filename);
 		final Mat input = Loader.loadOrExit(inputFile, IMREAD_UNCHANGED);
+		if (input.channels() == 3) {
+			cvtColor(input, input, CV_RGB2RGBA, 4);
+		}
 
 		// copy data over to create a new Black Shadow
 		final opencv_core.Size size = input.size();
-		final int type = input.type();
-		final Mat shadow = new Mat(size, type, new opencv_core.Scalar(0, 0, 0, 255));
+		final Mat shadow = new Mat(size, 24, new opencv_core.Scalar(0, 0, 0, 255));
 
 		// make the result in total 16px wider
 		final opencv_core.Size resultSize = new opencv_core.Size(size.width() + 16, size.height() + 16);
-		final Mat result = new Mat(resultSize, type, new opencv_core.Scalar(0, 0, 0, 0));
+		final Mat result = new Mat(resultSize, 24, new opencv_core.Scalar(0, 0, 0, 0));
 
 		// copy the black shadow over
 		final Mat shadowROI = result.apply(new opencv_core.Rect(8, 8, size.width(), size.height()));

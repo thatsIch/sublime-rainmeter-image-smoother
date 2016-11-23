@@ -1,5 +1,9 @@
 package de.thatsich.rainmeter.image.smooth;
 
+import org.bytedeco.javacv.CanvasFrame;
+import org.bytedeco.javacv.OpenCVFrameConverter;
+
+import javax.swing.*;
 import java.io.File;
 
 import static org.bytedeco.javacpp.opencv_core.Mat;
@@ -19,13 +23,13 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
  */
 public class Loader {
 
-//	static void show(Mat mat, String title) {
-//		final ToMat converter = new ToMat();
-//
-//		CanvasFrame canvas = new CanvasFrame(title, 1);
-//		canvas.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-//		canvas.showImage(converter.convert(mat));
-//	}
+	static void show(Mat mat, String title) {
+		final OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
+
+		CanvasFrame canvas = new CanvasFrame(title, 1);
+		canvas.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		canvas.showImage(converter.convert(mat));
+	}
 
 	static Mat loadOrExit(File file, int flags) {
 		final Mat image = imread(file.getAbsolutePath(), flags);
