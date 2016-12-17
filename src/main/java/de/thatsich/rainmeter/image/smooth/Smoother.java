@@ -51,7 +51,19 @@ public class Smoother {
 
 		// save for comparison sake
 		final File parentFile = inputFile.getParentFile();
-		final File outputFile = new File(parentFile, "output.png");
+		final String strippedFileName = getFileNameWithoutExtension(inputFile);
+
+		final File outputFile = new File(parentFile, strippedFileName + "-shaded.png");
 		Loader.save(outputFile, result);
+	}
+
+	private static String getFileNameWithoutExtension(File file) {
+		final String name = file.getName();
+		final int pos = name.lastIndexOf(".");
+		if (pos > 0) {
+			return name.substring(0, pos);
+		}
+
+		throw new RuntimeException("Expected file with an extension but got '" + name + "' through '" + file + "'");
 	}
 }
