@@ -16,6 +16,11 @@ The ground truth image (how it is supposed to look like) was given by [@merlinth
 
 ![Ground Truth](https://cloud.githubusercontent.com/assets/2210496/20466364/559b668a-af72-11e6-8dfc-dbd7e03d5825.png)
 
+Installation
+============
+* NPM: `npm i sublime-rainmeter-image-smoother`
+* OR download manually from [latest AppVeyor Artifact page](https://ci.appveyor.com/project/thatsIch/sublime-rainmeter-image-smoother/branch/master/artifacts)
+
 Building
 ========
     mvnw clean install
@@ -26,6 +31,10 @@ Running
 =======
 Note: this can only be run on windows because I found no good JNI Binding for https://pngquant.org/lib/. You have to compile it yourself and I would need to cross-compile it myself.
 
-    java -jar target/sublime-rainmeter-image-smoother-1.4.jar "path/to/input.png" "path/to/input2.png"
-        
+    java -jar sublime-rainmeter-image-smoother.jar "path/to/input.png" "path/to/input2.png"
+
+or through the NPM binding
+
+    sublime-rainmeter-image-smoother "path/to/input.png" "path/to/input2.png"
+
 results into two files in the same directories as `input` and `input2` with the postfix `-shaded` and compressed images with postfix `-or8`.

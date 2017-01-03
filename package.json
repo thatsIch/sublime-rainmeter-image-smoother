@@ -1,0 +1,15 @@
+{
+  "bin": {"sublime-rainmeter-image-smoother": "jdeploy-bundle/jdeploy.js"},
+  "author": "thatsIch",
+  "description": "This creates the smoothed image for sublime-rainmeter documentation",
+  "main": "index.js",
+  "preferGlobal": true,
+  "repository": "https://github.com/thatsIch/sublime-rainmeter-image-smoother",
+  "version": "1.4.0",
+  "jdeploy": {"jar": "target/sublime-rainmeter-image-smoother-1.4.0.jar"},
+  "dependencies": {"shelljs": "^0.7.6"},
+  "license": "ISC",
+  "name": "sublime-rainmeter-image-smoother",
+  "files": ["jdeploy-bundle"],
+  "scripts": {"test": "echo \"Error: no test specified\" && exit 1"}
+}

@@ -20,3 +20,6 @@
 
 # include CI files
 !appveyor.yml
+
+# include jdeploy files
+!package.json
