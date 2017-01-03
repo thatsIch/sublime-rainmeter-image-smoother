@@ -33,7 +33,7 @@ public class Smoother {
 			return;
 		}
 
-		final LocalTime totalStartTime = printWithTimeStamp("Start processing of '"+args.length+"' images");
+		final LocalTime totalStartTime = printWithTimeStamp("Start processing of '"+args.length+"' images\n");
 		for (final String filename : args) {
 			final LocalTime start = printWithTimeStamp("Processing '" + filename + "' out of '" + args.length + "'");
 
