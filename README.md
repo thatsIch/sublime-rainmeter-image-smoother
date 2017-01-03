@@ -16,7 +16,9 @@ The ground truth image (how it is supposed to look like) was given by [@merlinth
 
 Building
 ========
-    mvn clean install
+    mvnw clean install
+
+(This will install a Maven wrapper which requires you not to download and install Maven yourself)
 
 Running
 =======

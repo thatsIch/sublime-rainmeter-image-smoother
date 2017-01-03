@@ -3,7 +3,10 @@
 
 # include important folders
 # include maven
+!.mvn/
 !pom.xml
+!mvnw
+!mvnw.cmd
 
 # include markdowns
 !README.md
