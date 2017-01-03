@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/mmsc7ltsi4dq3cw2/branch/master?svg=true)](https://ci.appveyor.com/project/thatsIch/sublime-rainmeter-image-smoother/branch/master)
+
 About
 =====
 This is a simple tool which uses [OpenCV](http://opencv.org/) through its Java Binding [JavaCV](https://github.com/bytedeco/javacv) to generate a smoothed shadow on each image.
