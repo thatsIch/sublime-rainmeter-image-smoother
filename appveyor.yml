@@ -1,0 +1,11 @@
+install:
+  - mvnw --version
+
+build_script:
+  - mvnw clean install
+
+artifacts:
+  - path: target\sublime-rainmeter-image-smoother-*-jar-with-dependencies.jar
+
+cache:
+  - '%userprofile%\.m2 -> pom.xml'
