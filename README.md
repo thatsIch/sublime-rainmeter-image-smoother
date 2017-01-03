@@ -24,6 +24,6 @@ Building
 
 Running
 =======
-    java -jar target/sublime-rainmeter-image-smoother-1.2.jar "path/to/input.png" "path/to/input2.png"
+    java -jar target/sublime-rainmeter-image-smoother-1.3.jar "path/to/input.png" "path/to/input2.png"
     
-results into two files in the same directories as `input` and `input2` with the postfix `-shaded`.
+results into two files in the same directories as `input` and `input2` with the postfix `-shaded` and compressed images with postfix `-compressed`.

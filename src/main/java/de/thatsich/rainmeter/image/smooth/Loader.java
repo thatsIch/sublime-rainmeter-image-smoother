@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.io.File;
 
 import static org.bytedeco.javacpp.opencv_core.Mat;
+import static org.bytedeco.javacpp.opencv_imgcodecs.CV_IMWRITE_PNG_COMPRESSION;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
 
@@ -42,6 +43,7 @@ public class Loader {
 	}
 
 	static void save(File file, Mat image) {
-		imwrite(file.getAbsolutePath(), image);
+		final int[] params = {CV_IMWRITE_PNG_COMPRESSION, 9};
+		imwrite(file.getAbsolutePath(), image, params);
 	}
 }

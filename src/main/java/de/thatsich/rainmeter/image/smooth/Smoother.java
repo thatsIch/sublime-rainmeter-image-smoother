@@ -1,8 +1,17 @@
 package de.thatsich.rainmeter.image.smooth;
 
+import com.googlecode.pngtastic.core.PngImage;
+import com.googlecode.pngtastic.core.PngOptimizer;
 import org.bytedeco.javacpp.opencv_core;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 import static org.bytedeco.javacpp.opencv_core.Mat;
 import static org.bytedeco.javacpp.opencv_imgcodecs.IMREAD_UNCHANGED;
@@ -16,38 +25,49 @@ import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
  * @since 1.0-SNAPSHOT
  */
 public class Smoother {
+
+
 	public static void main(String[] args) {
 		if (args.length < 1) {
 			System.err.println("Requires at least one argument: <path to image>+");
 			return;
 		}
 
+		final LocalTime totalStartTime = printWithTimeStamp("Start processing of '"+args.length+"' images");
 		for (final String filename : args) {
+			final LocalTime start = printWithTimeStamp("Processing '" + filename + "' out of '" + args.length + "'");
+
 			final File inputFile = new File(filename);
 			final Mat input = Loader.loadOrExit(inputFile, IMREAD_UNCHANGED);
 			if (input.channels() == 3) {
 				cvtColor(input, input, CV_RGB2RGBA, 4);
 			}
+			printWithTimeStamp("\t- Loaded '" + filename + "'");
 
 			// copy data over to create a new Black Shadow
 			final opencv_core.Size size = input.size();
 			final Mat shadow = new Mat(size, 24, new opencv_core.Scalar(0, 0, 0, 255));
+			printWithTimeStamp("\t- Created black shadow with size " + getSizeString(size));
 
 			// make the result in total 16px wider
 			final opencv_core.Size resultSize = new opencv_core.Size(size.width() + 16, size.height() + 16);
 			final Mat result = new Mat(resultSize, 24, new opencv_core.Scalar(0, 0, 0, 0));
+			printWithTimeStamp("\t- Enlarged image for shifting operation to size " + getSizeString(resultSize));
 
 			// copy the black shadow over
 			final Mat shadowROI = result.apply(new opencv_core.Rect(8, 8, size.width(), size.height()));
 			shadow.copyTo(shadowROI);
+			printWithTimeStamp("\t- Copied over the black shadow");
 
 			// blur the shadow
 			final opencv_core.Size kernelSize = new opencv_core.Size(10, 10);
 			blur(result, result, kernelSize);
+			printWithTimeStamp("\t- Blurred shadow with kernel size " + getSizeString(kernelSize));
 
 			// copy in the original image offset by 6,6 topleft
 			final Mat imageROI = result.apply(new opencv_core.Rect(6, 6, size.width(), size.height()));
 			input.copyTo(imageROI);
+			printWithTimeStamp("\t- Copied over the original image");
 
 			// save for comparison sake
 			final File parentFile = inputFile.getParentFile();
@@ -55,7 +75,44 @@ public class Smoother {
 
 			final File outputFile = new File(parentFile, strippedFileName + "-shaded.png");
 			Loader.save(outputFile, result);
+			printWithTimeStamp("\t- Saved shaded image to '" + outputFile + "'");
+
+			// compression
+			try {
+				final File compressedFile = compressPNGFile(outputFile);
+				final long initialSize = outputFile.length();
+				final long compressedSize = compressedFile.length();
+				final double sizePercentage = ((double) compressedSize / initialSize) * 100;
+				final String formattedPercentage = String.format("%.2f", sizePercentage);
+
+				printWithTimeStamp("\t- Compressed image '" + compressedFile + "' to '" + formattedPercentage + "%'");
+			} catch (IOException e) {
+				// ignore error it will just not compress it
+				e.printStackTrace();
+			}
+
+			final LocalTime end = LocalTime.now();
+			final long processingTime = start.until(end, ChronoUnit.MILLIS);
+			printWithTimeStamp("Whole process for '"+filename+"' took '" + processingTime + "'ms\n");
 		}
+
+		final LocalTime finalEndTime = LocalTime.now();
+		final long totalMSDiff = totalStartTime.until(finalEndTime, ChronoUnit.MILLIS);
+		printWithTimeStamp("Shading of '"+args.length+"' images took '"+totalMSDiff+"'ms");
+	}
+
+	private static LocalTime lastTimeStamp = null;
+	private static LocalTime printWithTimeStamp(final String message) {
+		final LocalTime now = LocalTime.now();
+		final String offset = (lastTimeStamp != null) ? " +" + String.format("% 5d", lastTimeStamp.until(now, ChronoUnit.MILLIS)) : "";
+		lastTimeStamp = now;
+		System.out.println("["+now+offset+"] " + message);
+
+		return now;
+	}
+
+	private static String getSizeString(opencv_core.Size size) {
+		return "'("+size.width()+", "+size.height()+")'";
 	}
 
 	private static String getFileNameWithoutExtension(File file) {
@@ -66,5 +123,27 @@ public class Smoother {
 		}
 
 		throw new RuntimeException("Expected file with an extension but got '" + name + "' through '" + file + "'");
+	}
+
+	private static File compressPNGFile(final File pngFile) throws IOException {
+		final InputStream in = new BufferedInputStream(new FileInputStream(pngFile));
+		final PngImage image = new PngImage(in);
+
+		// optimize
+		final PngOptimizer optimizer = new PngOptimizer();
+		final PngImage optimizedImage = optimizer.optimize(image);
+
+		// export the optimized image to a new file
+		final ByteArrayOutputStream optimizedBytes = new ByteArrayOutputStream();
+		optimizedImage.writeDataOutputStream(optimizedBytes);
+
+		final String parentFile = pngFile.getParent();
+		final String inFileName = getFileNameWithoutExtension(pngFile);
+
+		final File outputFile = new File(parentFile, inFileName + "-compressed.png");
+		final String filePath = outputFile.getAbsolutePath();
+		optimizedImage.export(filePath, optimizedBytes.toByteArray());
+
+		return outputFile;
 	}
 }
