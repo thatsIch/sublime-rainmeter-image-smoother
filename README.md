@@ -24,6 +24,8 @@ Building
 
 Running
 =======
-    java -jar target/sublime-rainmeter-image-smoother-1.3.jar "path/to/input.png" "path/to/input2.png"
-    
-results into two files in the same directories as `input` and `input2` with the postfix `-shaded` and compressed images with postfix `-compressed`.
+Note: this can only be run on windows because I found no good JNI Binding for https://pngquant.org/lib/. You have to compile it yourself and I would need to cross-compile it myself.
+
+    java -jar target/sublime-rainmeter-image-smoother-1.4.jar "path/to/input.png" "path/to/input2.png"
+        
+results into two files in the same directories as `input` and `input2` with the postfix `-shaded` and compressed images with postfix `-or8`.

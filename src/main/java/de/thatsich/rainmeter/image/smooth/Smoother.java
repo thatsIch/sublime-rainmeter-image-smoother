@@ -1,15 +1,11 @@
 package de.thatsich.rainmeter.image.smooth;
 
-import com.googlecode.pngtastic.core.PngImage;
-import com.googlecode.pngtastic.core.PngOptimizer;
+import org.apache.commons.io.FileUtils;
 import org.bytedeco.javacpp.opencv_core;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 
@@ -77,17 +73,15 @@ public class Smoother {
 			Loader.save(outputFile, result);
 			printWithTimeStamp("\t- Saved shaded image to '" + outputFile + "'");
 
-			// compression
 			try {
-				final File compressedFile = compressPNGFile(outputFile);
+				final File qFile = quantifyPngFile(outputFile);
 				final long initialSize = outputFile.length();
-				final long compressedSize = compressedFile.length();
+				final long compressedSize = qFile.length();
 				final double sizePercentage = ((double) compressedSize / initialSize) * 100;
 				final String formattedPercentage = String.format("%.2f", sizePercentage);
 
-				printWithTimeStamp("\t- Compressed image '" + compressedFile + "' to '" + formattedPercentage + "%'");
-			} catch (IOException e) {
-				// ignore error it will just not compress it
+				printWithTimeStamp("\t- Quantified image '" + qFile + "' to '" + formattedPercentage + "%'");
+			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
 			}
 
@@ -125,24 +119,27 @@ public class Smoother {
 		throw new RuntimeException("Expected file with an extension but got '" + name + "' through '" + file + "'");
 	}
 
-	private static File compressPNGFile(final File pngFile) throws IOException {
-		final InputStream in = new BufferedInputStream(new FileInputStream(pngFile));
-		final PngImage image = new PngImage(in);
+	private static File extractQuantifyer() throws IOException {
+		final URL inputUrl = Smoother.class.getResource("/pngquant.exe");
+		final File tempFile = File.createTempFile("pngquant", ".exe");
+		FileUtils.copyURLToFile(inputUrl, tempFile);
 
-		// optimize
-		final PngOptimizer optimizer = new PngOptimizer();
-		final PngImage optimizedImage = optimizer.optimize(image);
+		return tempFile;
+	}
 
-		// export the optimized image to a new file
-		final ByteArrayOutputStream optimizedBytes = new ByteArrayOutputStream();
-		optimizedImage.writeDataOutputStream(optimizedBytes);
+	private static File quantifyPngFile(final File pngFile) throws IOException, InterruptedException {
+		final File quantifyer = extractQuantifyer();
+		ProcessBuilder pb = new ProcessBuilder();
+		pb.inheritIO();
+		pb.command(quantifyer.getAbsolutePath(), "--force", "--verbose", "--ordered", "--speed=1", "--quality=50-90", pngFile.getAbsolutePath());
+		Process p = pb.start();
+		int result = p.waitFor();
+		if (result != 0) {
+			System.exit(result);
+		}
 
-		final String parentFile = pngFile.getParent();
-		final String inFileName = getFileNameWithoutExtension(pngFile);
-
-		final File outputFile = new File(parentFile, inFileName + "-compressed.png");
-		final String filePath = outputFile.getAbsolutePath();
-		optimizedImage.export(filePath, optimizedBytes.toByteArray());
+		final String parent = pngFile.getParent();
+		final File outputFile = new File(parent, getFileNameWithoutExtension(pngFile) + "-or8.png");
 
 		return outputFile;
 	}
