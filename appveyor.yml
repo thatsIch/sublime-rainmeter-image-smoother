@@ -1,11 +1,17 @@
 install:
+  # check for maven wrapper
   - mvnw --version
+
+  # download jar shrinker to minify the jar
+  - ps: appveyor DownloadFile "https://github.com/Deconimus/JarShrink/releases/download/1.0b/JarShrink.v1.0c.zip"
+  - ps: 7z e .\JarShrink.v1.0c.zip -oc:\jar-shrink jarShrink.jar -r
 
 build_script:
   - mvnw clean install
+  - java -jar c:\jar-shrink\jarShrink.jar target\sublime-rainmeter-image-smoother-1.4.0.jar -k de.thatsich.rainmeter.image.smooth.Smoother -k org.bytedeco.javacpp.CLongPointer -n -o target\shrunk-sublime-rainmeter-image-smoother-1.4.0.jar
 
 artifacts:
-  - path: target\sublime-rainmeter-image-smoother-*-jar-with-dependencies.jar
+  - path: target\shrunk-sublime-rainmeter-image-smoother-*.jar
 
 cache:
   - '%userprofile%\.m2 -> pom.xml'
