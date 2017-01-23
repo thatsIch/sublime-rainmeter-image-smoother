@@ -2,7 +2,7 @@
 /*
 
 # include important folders
-# include maven
+# include maven and its plugin-files
 !.mvn/
 !pom.xml
 !mvnw
@@ -16,7 +16,6 @@
 !src/
 
 # include git important files
-!.gitmodules
 !.gitignore
 
 # include CI files
