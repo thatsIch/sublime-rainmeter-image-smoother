@@ -23,3 +23,7 @@
 
 # include jdeploy files
 !package.json
+
+# ignore stuff which happens due to testing
+src/test/resources/input-shaded-or8.png
+src/test/resources/input-shaded.png
